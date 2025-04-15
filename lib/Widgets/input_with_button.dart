@@ -63,7 +63,6 @@ class _InputWithButtonState extends State<InputWithButton> {
 
   @override
   void dispose() {
-    // Limpiar el controlador cuando el widget se desmonte
     _textController.dispose();
     super.dispose();
   }

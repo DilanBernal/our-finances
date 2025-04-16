@@ -6,10 +6,6 @@ class NewEntryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InputWithButton(onSend: reirme);
-  }
-
-  void reirme(){
-    print("Laught");
+    return InputWithButton(onSend: (values) {print('values');}, fieldNames: ["jaja", "nooo"],);
   }
 }

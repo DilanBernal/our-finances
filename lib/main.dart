@@ -1,17 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:our_finances/Dao/sqlite/db_helper_sqlite.dart';
+import 'package:our_finances/Dao/sqlite/user_dao_sqlite.dart';
 import 'package:our_finances/Screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import 'Widgets/list_menu.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final sqliteHelper = DbSqlite.instance;
+  await sqliteHelper.database;
 
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<DbSqlite>(create: (_) => sqliteHelper),
+        Provider<UserDaoSqlite>(
+            create: (ctx) => UserDaoSqlite(dbHelper: ctx.read<DbSqlite>())
+        )
+      ],
+      child:MainApp(),
+    )
+  );
+}
+
+
+class MainApp extends StatelessWidget {
+  MainApp({super.key});
+  final ThemeData blackDarkTheme = ThemeData(
+    brightness: Brightness.dark,
+    scaffoldBackgroundColor: Colors.black,
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.black,
+      foregroundColor: Colors.white,
+    ),
+    drawerTheme: DrawerThemeData(
+      backgroundColor: Color.fromRGBO(20, 0, 20, 0.85),
+    ),
+    colorScheme: const ColorScheme.dark().copyWith(
+      primary: Colors.white,
+      onPrimary: Colors.black,
+      surface: Color.fromRGBO(82, 0, 138, 1.0),
+      onSurface: Colors.white,
+    ),
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Colors.white),
+      bodyMedium: TextStyle(color: Colors.white70),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      darkTheme: blackDarkTheme,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -26,55 +69,7 @@ class MyApp extends StatelessWidget {
           )
         ),
         drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              // Encabezado del menú
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: Text(
-                  'Menú Principal',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
-                ),
-              ),
-              // Opciones del menú
-              ListTile(
-                leading: Icon(Icons.home),
-                title: Text('Inicio'),
-                onTap: () {
-                  // Cerrar el menú lateral
-                  Navigator.pop(context);
-                  // Navegar a la pantalla de inicio
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.settings),
-                title: Text('Configuración'),
-                onTap: () {
-                  // Cerrar el menú lateral
-                  Navigator.pop(context);
-                  // Navegar a la pantalla de configuración
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.help),
-                title: Text('Ayuda'),
-                onTap: () {
-                  // Cerrar el menú lateral
-                  Navigator.pop(context);
-                  // Navegar a la pantalla de ayuda
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => HelpScreen()));
-                },
-              ),
-            ],
-          ),
+          child: ListMenu(),
         ),
       ),
     );

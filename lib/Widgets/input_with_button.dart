@@ -2,15 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 class InputWithButton extends StatefulWidget {
-  final Function(Map<String, String>) onSend; // Ahora recibe un mapa de valores
-  final List<String> fieldNames; // Nombres de los campos
-  final List<TextInputType>? keyboardTypes; // Tipos de teclado opcionales
-  final List<List<TextInputFormatter>>? inputFormatters; // Formateadores opcionales
+  final Function(Map<String, String>) onSend;
+  final List<String> fieldNames;
+  final List<TextInputType>? keyboardTypes;
+  final List<List<TextInputFormatter>>? inputFormatters;
+  final String buttonName;
 
   const InputWithButton({
     super.key,
     required this.onSend,
     required this.fieldNames,
+    required this.buttonName,
     this.keyboardTypes,
     this.inputFormatters,
   });
@@ -36,10 +38,9 @@ class _InputWithButtonState extends State<InputWithButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         children: [
-          // Generar un campo por cada nombre proporcionado
           ...List.generate(widget.fieldNames.length, (index) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
@@ -61,43 +62,21 @@ class _InputWithButtonState extends State<InputWithButton> {
               ),
             );
           }),
-
-          SizedBox(height: 20),
-
           CupertinoButton(
             onPressed: () {
-              // Capturar todos los valores
               final values = {
                 for (int i = 0; i < widget.fieldNames.length; i++)
                   widget.fieldNames[i]: _controllers[i].text
               };
-
               setState(() {
                 _capturedValues = values;
               });
-
-              widget.onSend(values);
+              widget.onSend(_capturedValues);
             },
             color: CupertinoColors.systemPink,
-            child: Text('Capturar Valores',
+            child: Text(widget.buttonName,
               style: TextStyle(color: CupertinoColors.white),
             ),
-          ),
-
-          SizedBox(height: 20),
-
-          // Mostrar todos los valores capturados
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _capturedValues.entries.map((entry) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  '${entry.key}: ${entry.value}',
-                  style: TextStyle(fontSize: 16),
-                ),
-              );
-            }).toList(),
           ),
         ],
       ),

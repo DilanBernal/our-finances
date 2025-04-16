@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:our_finances/Screens/new_entry_screen.dart';
-import 'package:our_finances/Screens/register_screen.dart';
 
 class HomeScreen extends StatelessWidget{
 
@@ -11,7 +10,7 @@ class HomeScreen extends StatelessWidget{
     return SafeArea(
       child: Column(
         children: [
-          RegisterScreen()
+          NewEntryScreen()
         ],
       ),
     );

@@ -14,7 +14,7 @@ class ListMenu extends StatelessWidget {
             color: Color.fromRGBO(46, 0, 76, 0.75),
           ),
           child: Text(
-            'Nuestras finanzas',
+            'Nuestras finanzas <3',
             style: TextStyle(
               fontSize: 24,
             ),

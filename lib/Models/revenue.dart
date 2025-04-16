@@ -1,21 +1,47 @@
 class Revenue {
   final int id;
   final int idUser;
-  final String name;
-  final DateTime date;
-  final String description;
+  String name;
+  DateTime date;
+  String? description;
   final double price;
   final int category;
+  bool inCloud;
 
-  Revenue({
-    required this.id,
-    required this.idUser,
-    required this.name,
-    required this.date,
-    required this.description,
-    required this.price,
-    required this.category
-  });
+  Revenue(
+      {required this.id,
+      required this.idUser,
+      required this.name,
+      required this.date,
+      this.description,
+      required this.price,
+      required this.category,
+      required this.inCloud});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'idUser': idUser,
+      'name': name,
+      'date': date,
+      'description': description,
+      'price': price,
+      'category': category,
+      'inCloud': inCloud == true ? 1 : 0
+    };
+  }
+  factory Revenue.fromMap(Map<String, dynamic> map) {
+    return Revenue(
+        id: map['id'],
+        idUser: map['idUser'],
+        name: map['name'],
+        date: (map['date']).toDateTime(),
+        price: (map['price'] as num).toDouble(),
+        category: map['category'],
+        inCloud: map['inCloud'] == 1
+    );
+  }
+
   factory Revenue.fromJson(Map<String, dynamic> json) {
     return Revenue(
         id: json['id'],
@@ -24,7 +50,8 @@ class Revenue {
         date: json['date'],
         description: json['description'],
         price: json['price'],
-        category: json['category']
+        category: json['category'],
+        inCloud: json['inCloud'] == 1
     );
   }
 }

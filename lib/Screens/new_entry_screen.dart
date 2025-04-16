@@ -6,6 +6,10 @@ class NewEntryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InputWithButton(onSend: (values) {print('values');}, fieldNames: ["jaja", "nooo"],);
+    return InputWithButton(onSend: (values) {_createEntry(values);}, fieldNames: ["Noooo", "La politsia"], buttonName: "Agregar gasto",);
+  }
+
+  Future<void> _createEntry(Map<String, String> values) async {
+
   }
 }

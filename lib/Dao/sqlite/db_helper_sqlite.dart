@@ -31,7 +31,8 @@ class DbSqlite {
       CREATE TABLE IF NOT EXISTS user(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name TEXT NOT NULL,
-        balance NUMERIC NOT NULL
+        balance NUMERIC NOT NULL,
+        inCloud INTEGER NOT NULL
       );
     ''');
 
@@ -39,7 +40,8 @@ class DbSqlite {
       CREATE TABLE IF NOT EXISTS category(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name TEXT NOT NULL,
-        icon NUMERIC NOT NULL
+        icon NUMERIC NOT NULL,
+        inCloud INTEGER NOT NULL
       );
     ''');
 
@@ -52,6 +54,7 @@ class DbSqlite {
         balance NUMERIC NOT NULL,
         category INTEGER NOT NULL,
         id_user INTEGER NOT NULL,
+        inCloud INTEGER NOT NULL,
         FOREIGN KEY(category) REFERENCES
         category(id),
         FOREIGN KEY(id_user) REFERENCES
@@ -67,6 +70,7 @@ class DbSqlite {
         description TEXT,
         balance NUMERIC NOT NULL,
         category INTEGER NOT NULL,
+        inCloud INTEGER NOT NULL,
         id_user INTEGER NOT NULL,
         FOREIGN KEY(category) REFERENCES
         category(id),

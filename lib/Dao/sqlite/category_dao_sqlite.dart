@@ -1,4 +1,5 @@
 import 'package:our_finances/Dao/sqlite/db_helper_sqlite.dart';
+import 'package:our_finances/Models/user.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../Models/category.dart';
 
@@ -26,6 +27,22 @@ class CategoryDaoSqlite {
     }
     catch (e){
       throw Exception("Ocurrio un error $e");
+    }
+  }
+
+
+  Future<List<User>> getAllUsers() async{
+    final db = await dbHelper.database;
+    try {
+      final List<Map<String, dynamic>> maps = await db.query(
+          'user',
+          orderBy: 'name ASC'
+      );
+      return List.generate(maps.length, (int i) {
+        return User.fromMap(maps[i]);
+      });
+    }catch(e) {
+      throw Exception(e);
     }
   }
 }

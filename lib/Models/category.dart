@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 class Category {
   final int id;
   String name;
-  String icon;
+  var icon;
   bool inCloud;
 
   Category(
@@ -14,7 +14,6 @@ class Category {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'name': name,
       'icon': icon,
       'inCloud': inCloud == true ? 1 : 0
@@ -22,17 +21,17 @@ class Category {
   }
 
   Icon get iconCode => Icon(IconData(
-        int.parse(icon),
-        fontFamily: icon.isNotEmpty ? icon : null,
+        icon,
+        fontFamily: 'MaterialIcons'
       ));
 
-  IconData get iconData => IconData(int.parse(icon));
+  IconData get iconData => IconData(icon, fontFamily: 'MaterialIcons');
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
         id: map['id'],
         name: map['name'],
-        icon: map['name'],
-        inCloud: map['name'] == 1);
+        icon: map['icon'],
+        inCloud: map['inCloud'] == 1);
   }
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(

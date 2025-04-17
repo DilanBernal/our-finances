@@ -1,3 +1,4 @@
+import 'package:our_finances/Models/category.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -11,7 +12,7 @@ class DbSqlite {
   static Database? _db;
 
   Future<Database> get database async {
-    if(_db != null) return _db!;
+    if (_db != null) return _db!;
     _db = await _initDB();
     return _db!;
   }
@@ -27,7 +28,8 @@ class DbSqlite {
   }
 
   Future _onCreate(Database db, int version) async {
-    await db.execute('''
+    try {
+      await db.execute('''
       CREATE TABLE IF NOT EXISTS user(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name TEXT NOT NULL,
@@ -35,8 +37,7 @@ class DbSqlite {
         inCloud INTEGER NOT NULL
       );
     ''');
-
-    await db.execute('''
+      await db.execute('''
       CREATE TABLE IF NOT EXISTS category(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name TEXT NOT NULL,
@@ -44,8 +45,7 @@ class DbSqlite {
         inCloud INTEGER NOT NULL
       );
     ''');
-
-    await db.execute('''
+      await db.execute('''
       CREATE TABLE IF NOT EXISTS payment(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name TEXT NOT NULL,
@@ -62,7 +62,14 @@ class DbSqlite {
       );
     ''');
 
-    await db.execute('''
+      await db.insert('category',
+          Category(id: 0,name: 'Comida', icon: 57946, inCloud: false).toMap());
+      await db.insert('category',
+          Category(id: 0,name: 'Transporte', icon: 61379, inCloud: false).toMap());
+      await db.insert('category',
+          Category(id: 0,name: 'Deudas', icon: 62303, inCloud: false).toMap());
+
+      await db.execute('''
       CREATE TABLE IF NOT EXISTS revenue(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name TEXT NOT NULL,
@@ -78,9 +85,12 @@ class DbSqlite {
         user(id)
       );
     ''');
+    } catch (e) {
+      throw Exception("Ocurrio un error con la base de datos $e");
+    }
   }
 
-  Future close() async{
+  Future close() async {
     if (_db != null) {
       await _db!.close();
       _db = null;

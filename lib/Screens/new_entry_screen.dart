@@ -18,8 +18,9 @@ class NewEntryScreen extends StatefulWidget {
 }
 
 class _NewEntryScreenState extends State<NewEntryScreen> {
-  List<Category> _categories = [];
   List<String> _categoryNames = [];
+  Map<String, IconData> _categoryIcons = {};
+  Map<String, int> _categoriesId = {};
   bool _loadingCategories = true;
 
   @override
@@ -28,18 +29,20 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
     _loadCategories();
   }
 
-  Future<void> _loadCategories() async{
+  Future<void> _loadCategories() async {
     final categoryRepo = context.read<CategoryDaoSqlite>();
     try {
       final categories = await _getAllCategories(categoryRepo);
-      final names = await _getAllCategoriesNames(_categories);
+      final names = await _getAllCategoriesNames(categories);
+      final icons = await _getAllCategoriesIcons(categories);
+      final ids = await _getAllCategoriesId(categories);
       setState(() {
-        _categories = categories;
         _categoryNames = names;
+        _categoryIcons = icons;
+        _categoriesId = ids;
         _loadingCategories = false;
       });
-    }
-    catch (e){
+    } catch (e) {
       _loadingCategories = false;
       throw Exception(e);
     }
@@ -52,45 +55,63 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
     return Column(children: [
       FormTitle(title: "Agregar entrada de dinero"),
       _loadingCategories
-      ? const CircularProgressIndicator()
-          :
-      InputWithButton(
-        onSend: (values) {
-          _createEntry(values, revenueRepo);
-        },
-        fieldNames: ["nombre", "fecha", "precio", "categoria", "descripcion"],
-        keyboardTypes: [
-          TextInputType.text,
-          TextInputType.datetime,
-          TextInputType.number,
-          TextInputType.multiline
-        ],
-        inputFormatters: [
-          [],
-          [],
-          [FilteringTextInputFormatter.digitsOnly],
-          []
-        ],
-        buttonName: "Agregar gasto",
-        dropdownOptions: {'categoria': _categoryNames},
-      )
+          ? const CircularProgressIndicator()
+          : InputWithButton(
+              onSend: (values) {
+                _createEntry(values, revenueRepo);
+              },
+              fieldNames: [
+                "nombre",
+                "fecha",
+                "precio",
+                "categoria",
+                "descripcion"
+              ],
+              keyboardTypes: [
+                TextInputType.text,
+                TextInputType.datetime,
+                TextInputType.number,
+                TextInputType.multiline
+              ],
+              inputFormatters: [
+                [],
+                [],
+                [FilteringTextInputFormatter.digitsOnly],
+                []
+              ],
+              dropdownIcons: {'categoria': _categoryIcons},
+              buttonName: "Agregar gasto",
+              dropdownOptions: {'categoria': _categoryNames},
+              dropdownElementId: {'categoria': _categoriesId},
+            )
     ]);
   }
 
-  Future<void> _createEntry(Map<String, String> values, RevenueDaoSqlite revRepo) async {
+  Future<void> _createEntry(
+      Map<String, String> values, RevenueDaoSqlite revRepo) async {
     final prefs = await SharedPreferences.getInstance();
     final idUser = prefs.getInt('userId');
+    print(values);
     try {
       final name = values['nombre']!;
-      final DateTime date = DateTime.tryParse(values['fecha']!) ?? DateTime.now();
+      final DateTime date =
+          DateTime.tryParse(values['fecha']!) ?? DateTime.now();
       final price = double.tryParse(values['precio']!);
       final description = values['descripcion'];
-      if (name.trim() != '' && price! > 50){
-        final revenue = Revenue(id: 0, idUser: idUser!, name: name, date: date, price: price, description: description, category: 2, inCloud: false);
+      if (name.trim() != '' && price! > 50) {
+        final revenue = Revenue(
+            id: 0,
+            idUser: idUser!,
+            name: name,
+            date: date,
+            price: price,
+            description: description,
+            category: 2,
+            inCloud: false);
         int idGenerated = await revRepo.insertRevenue(revenue);
+        print(idGenerated);
       }
-    }
-    catch (e){
+    } catch (e) {
       return;
     }
   }
@@ -99,20 +120,32 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
     try {
       List<Category> categoryList = await catRepo.getAllCategories();
       return categoryList;
-    }
-    catch (e) {
+    } catch (e) {
       return [];
     }
   }
 
-  Future<List<String>> _getAllCategoriesNames(List<Category> categoryList) async {
+  Future<List<String>> _getAllCategoriesNames(
+      List<Category> categoryList) async {
     return categoryList.map((category) => category.name).toList();
   }
 
-  Future<Map<String, IconData>> _getAllCategoriesIcons(List<Category> categoryList) async {
+  Future<Map<String, IconData>> _getAllCategoriesIcons(
+      List<Category> categoryList) async {
     Map<String, IconData> categories = {};
-    for(var value in categoryList) {
+    for (var value in categoryList) {
       final result = <String, IconData>{value.name: value.iconData};
+      categories.addEntries(result.entries);
+    }
+    return categories;
+  }
+
+  Future<Map<String, int>> _getAllCategoriesId(
+      List<Category> categoryList) async {
+    Map<String, int> categories = {};
+
+    for (var value in categoryList) {
+      final result = <String, int>{value.name: value.id};
       categories.addEntries(result.entries);
     }
     return categories;

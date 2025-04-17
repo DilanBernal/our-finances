@@ -11,21 +11,20 @@ class InputWithButton extends StatefulWidget {
   final String buttonName;
   final Map<String, List<String>>? dropdownOptions;
   final Map<String, String>? initialDropdownValues;
-  final Map<String, IconData>? dropdownIcons;
-  final Map<String, int>? dropdownElementId;
+  final Map<String, Map<String, IconData>>? dropdownIcons;
+  final Map<String, Map<String, int>>? dropdownElementId;
 
-  const InputWithButton({
-    super.key,
-    required this.onSend,
-    required this.fieldNames,
-    required this.buttonName,
-    this.keyboardTypes,
-    this.inputFormatters,
-    this.dropdownOptions,
-    this.initialDropdownValues,
-    this.dropdownIcons,
-    this.dropdownElementId
-  });
+  const InputWithButton(
+      {super.key,
+      required this.onSend,
+      required this.fieldNames,
+      required this.buttonName,
+      this.keyboardTypes,
+      this.inputFormatters,
+      this.dropdownOptions,
+      this.initialDropdownValues,
+      this.dropdownIcons,
+      this.dropdownElementId});
 
   @override
   _InputWithButtonState createState() => _InputWithButtonState();
@@ -128,10 +127,15 @@ class _InputWithButtonState extends State<InputWithButton> {
       readOnly: true,
       decoration: InputDecoration(
         labelText: 'Selecciona ${widget.fieldNames[index]}',
-        prefixIcon: Icon(Icons.calendar_today),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+        prefixIcon: Icon(
+          Icons.calendar_today,
+          color: CupertinoColors.systemBlue,
         ),
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: CupertinoColors.systemBlue),
+            borderRadius: BorderRadius.circular(8)),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: CupertinoColors.activeBlue)),
         contentPadding: EdgeInsets.all(12),
       ),
       onTap: () async {
@@ -166,17 +170,42 @@ class _InputWithButtonState extends State<InputWithButton> {
   Widget _buildDropdownField(String fieldName) {
     final List<String> options = widget.dropdownOptions?[fieldName] ?? [];
 
-    final bool hasIcons = widget.dropdownIcons?.containsKey(fieldName) ?? false;
-    final IconData? fieldIcon = widget.dropdownIcons?[fieldName];
+    final Map<String, IconData>? iconsForField =
+        widget.dropdownIcons?[fieldName];
+    final Map<String, int> optionIds = widget.dropdownElementId![fieldName]!;
     return DropdownButtonFormField<String>(
       value: _dropdownValues[fieldName],
       decoration: InputDecoration(
-        labelText: fieldName,
-      ),
-      items: options.map((String value) {
+          labelText: fieldName,
+          enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: CupertinoColors.systemBlue),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(4),
+                  bottomRight: Radius.circular(4))),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: CupertinoColors.systemBlue),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(4),
+                  bottomRight: Radius.circular(4)))),
+      items: options.map((String option) {
         return DropdownMenuItem<String>(
-          value: value,
-          child: Text((value)),
+          value: optionIds[option].toString(),
+          child: iconsForField != null && iconsForField.containsKey(option)
+              ? Row(
+                  children: [
+                    Icon(
+                      iconsForField[option],
+                      color: CupertinoColors.systemPurple,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(option),
+                  ],
+                )
+              : Text((option)),
         );
       }).toList(),
       onChanged: (String? newValue) {

@@ -10,6 +10,7 @@ class FormTitle extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: Text(
         title,
+        textAlign: TextAlign.center,
         style: TextStyle(
             fontSize: 30,
             color: Color.fromRGBO(182, 182, 255, 1.0),

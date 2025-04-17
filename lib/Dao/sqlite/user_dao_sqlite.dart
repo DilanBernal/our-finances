@@ -7,7 +7,7 @@ class UserDaoSqlite {
 
   UserDaoSqlite ({required this.dbHelper});
 
-  Future insertUser(User user) async {
+  Future<int> insertUser(User user) async {
     final db = await dbHelper.database;
     int id =  await db.insert(
         'user',
@@ -19,18 +19,16 @@ class UserDaoSqlite {
 
   Future<List<User>> getAllUsers() async{
     final db = await dbHelper.database;
-
     try {
       final List<Map<String, dynamic>> maps = await db.query(
           'user',
           orderBy: 'name ASC'
       );
       return List.generate(maps.length, (int i) {
-        print(maps[i]);
         return User.fromMap(maps[i]);
       });
     }catch(e) {
-      throw Exception('Error al cargar usuarios');
+      throw Exception(e);
     }
   }
 

@@ -6,6 +6,8 @@ import 'package:our_finances/Widgets/input_with_button.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Widgets/form_title.dart';
+
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
@@ -16,12 +18,7 @@ class RegisterScreen extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          "Registro",
-          style: TextStyle(
-              color: Color.fromRGBO(182, 182, 255, 1.0),
-              decoration: TextDecoration.none),
-        ),
+        FormTitle(title: "Registro"),
         InputWithButton(
           onSend: (values) => {_createUser(values, userRepo)},
           fieldNames: ["nombre", "dinero"],
@@ -36,14 +33,13 @@ class RegisterScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _createUser(
-      Map<String, String> values, UserDaoSqlite userRepo) async {
+  Future<void> _createUser(Map<String, String> values, UserDaoSqlite userRepo) async {
     final prefs = await SharedPreferences.getInstance();
+    final bool isFirst = prefs.getBool('isFirstLaunch') ?? true;
     try {
       final name = values['nombre']!;
       final balance = double.tryParse(values['dinero']!) ?? 0.0;
-
-      if (name.trim() != '') {
+      if (name.trim() != '' && isFirst == true) {
         final user = User(id: 0, name: name, balance: balance, inCloud: false);
         int idGenerated = await userRepo.insertUser(user);
         await prefs.setInt('userId', idGenerated);
@@ -51,7 +47,8 @@ class RegisterScreen extends StatelessWidget {
       }
       await userRepo.getAllUsers();
     } catch (e) {
-      print(e);
+      throw Exception(e);
     }
   }
 }
+

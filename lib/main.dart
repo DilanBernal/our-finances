@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:our_finances/Dao/sqlite/category_dao_sqlite.dart';
 import 'package:our_finances/Dao/sqlite/db_helper_sqlite.dart';
+import 'package:our_finances/Dao/sqlite/revenue_dao_sqlite.dart';
 import 'package:our_finances/Dao/sqlite/user_dao_sqlite.dart';
 import 'package:our_finances/Screens/home_screen.dart';
 import 'package:our_finances/Screens/register_screen.dart';
@@ -17,30 +19,74 @@ void main() async {
     providers: [
       Provider<DbSqlite>(create: (_) => sqliteHelper),
       Provider<UserDaoSqlite>(
-          create: (ctx) => UserDaoSqlite(dbHelper: ctx.read<DbSqlite>()))
+          create: (ctx) => UserDaoSqlite(dbHelper: ctx.read<DbSqlite>())),
+      Provider<RevenueDaoSqlite>(
+          create: (ctx) => RevenueDaoSqlite(dbHelper: ctx.read<DbSqlite>())),
+      Provider<SharedPreferences>(create: (_) => prefs),
+      Provider<CategoryDaoSqlite>(
+          create: (ctx) => CategoryDaoSqlite(dbHelper: ctx.read<DbSqlite>()))
     ],
-    child: MainApp(isFirstLaunch: isFirstLaunch),
+    child: MyApp(isFirstLaunch: isFirstLaunch),
   ));
 }
 
-class MainApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final bool isFirstLaunch;
 
-  MainApp({super.key, required this.isFirstLaunch});
+  const MyApp({super.key, required this.isFirstLaunch});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late bool _isFirstLaunch;
+  late SharedPreferences _prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFirstLaunch = widget.isFirstLaunch;
+    _setupPrefsListener();
+  }
+
+  Future<void> _setupPrefsListener() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _prefs = Provider.of<SharedPreferences>(context, listen: false);
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _checkFirstLaunchChange();
+      });
+    });
+  }
+
+  void _checkFirstLaunchChange() {
+    bool currentValue = _prefs.getBool('isFirstLaunch') ?? true;
+    if (currentValue != _isFirstLaunch) {
+      setState(() {
+        _isFirstLaunch = currentValue;
+      });
+    }
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _checkFirstLaunchChange();
+      }
+    });
+  }
+
   final ThemeData blackDarkTheme = ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: Colors.black,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,
     ),
-    drawerTheme: DrawerThemeData(
+    drawerTheme: const DrawerThemeData(
       backgroundColor: Color.fromRGBO(20, 0, 20, 0.85),
     ),
     colorScheme: const ColorScheme.dark().copyWith(
       primary: Colors.white,
       onPrimary: Colors.black,
-      surface: Color.fromRGBO(82, 0, 138, 1.0),
+      surface: const Color.fromRGBO(82, 0, 138, 1.0),
       onSurface: Colors.white,
     ),
     textTheme: const TextTheme(
@@ -56,20 +102,24 @@ class MainApp extends StatelessWidget {
       darkTheme: blackDarkTheme,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      home: isFirstLaunch
-          ? RegisterScreen()
+      home: _isFirstLaunch
+          ? const RegisterScreen()
           : Scaffold(
               appBar: AppBar(
-                title: Text(''),
+                title: const Text(''),
               ),
-              body: SafeArea(
-                  child: Column(
-                children: [HomeScreen()],
-              )),
+              body: const SafeArea(
+                child: HomeScreen(),
+              ),
               drawer: Drawer(
                 child: ListMenu(),
               ),
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ListMenu extends StatelessWidget {
   const ListMenu({
-    super.key,
+    super.key
   });
 
   @override
@@ -14,9 +14,9 @@ class ListMenu extends StatelessWidget {
             color: Color.fromRGBO(46, 0, 76, 0.75),
           ),
           child: Text(
-            'Nuestras finanzas <3',
+            "Nuestras finanzas ❤️",
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 27,
             ),
           ),
         ),

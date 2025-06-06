@@ -20,10 +20,9 @@ class Revenue {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'idUser': idUser,
+      'id_user': idUser,
       'name': name,
-      'date': date,
+      'date': date.toString(),
       'description': description,
       'price': price,
       'category': category,

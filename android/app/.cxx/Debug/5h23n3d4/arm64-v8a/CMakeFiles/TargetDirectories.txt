@@ -1,0 +1,2 @@
+/Users/admin/Documents/GitHub/our-finances/android/app/.cxx/Debug/5h23n3d4/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/admin/Documents/GitHub/our-finances/android/app/.cxx/Debug/5h23n3d4/arm64-v8a/CMakeFiles/rebuild_cache.dir

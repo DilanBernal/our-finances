@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../Screens/home_screen.dart';
+
 class ListMenu extends StatelessWidget {
   const ListMenu({
     super.key
@@ -20,15 +22,12 @@ class ListMenu extends StatelessWidget {
             ),
           ),
         ),
-        // Opciones del menú
         ListTile(
           leading: Icon(Icons.home),
           title: Text('Inicio'),
           onTap: () {
-            // Cerrar el menú lateral
             Navigator.pop(context);
-            // Navegar a la pantalla de inicio
-            // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
           },
         ),
         ListTile(

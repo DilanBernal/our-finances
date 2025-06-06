@@ -91,7 +91,6 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
       Map<String, String> values, RevenueDaoSqlite revRepo) async {
     final prefs = await SharedPreferences.getInstance();
     final idUser = prefs.getInt('userId');
-    print(values);
     try {
       final name = values['nombre']!;
       final DateTime date =
@@ -109,7 +108,6 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
             category: 2,
             inCloud: false);
         int idGenerated = await revRepo.insertRevenue(revenue);
-        print(idGenerated);
       }
     } catch (e) {
       return;
